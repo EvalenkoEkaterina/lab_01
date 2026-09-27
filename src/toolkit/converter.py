@@ -1,10 +1,10 @@
-import sys
 
-from validator import (
-    ExpressionError, check_input,
-    validate_number, validate_units, validate_temperature,
+from toolkit.validator import (
+    validate_number,
+    validate_temperature,
+    validate_units,
 )
-
+from .errors import ExpressionError
 GROUPS = {
     "length": {"mm", "cm", "m", "km"},
     "mass": {"g", "kg"},
@@ -13,6 +13,31 @@ GROUPS = {
 
 
 def convert(value_text, from_name, to_name):#что переводим, из какой единицы, в какую
+    """
+    Конвертирует значение из одной единицы измерения в другую.
+
+    Поддерживает три группы единиц: длину (mm, cm, m, km),
+    массу (g, kg) и температуру (c, f, k). Регистр единиц не
+    учитывается. Конвертация между единицами из разных групп
+    запрещена. Для температуры дополнительно проверяется, что
+    значение не ниже абсолютного нуля.
+
+    Параметры:
+        value_text (str): значение для конвертации в виде строки
+            (будет преобразовано в число).
+        from_name (str): единица измерения исходного значения.
+        to_name (str): единица измерения, в которую нужно перевести.
+
+    Возвращает:
+        float: результат конвертации.
+
+    Исключения:
+        ExpressionError: если value_text не является корректным
+            числом, если from_name или to_name — неизвестная единица,
+            если from_name и to_name относятся к разным группам,
+            если температура ниже абсолютного нуля, или если для
+            данной пары единиц конвертация не реализована.
+    """
     value = validate_number(value_text)                       # неверное число
     group, unit, to_unit = validate_units(from_name, to_name)
     # неизвестная единица, несовместимые единицы
